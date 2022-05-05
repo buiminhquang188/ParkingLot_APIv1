@@ -4,7 +4,7 @@ process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
 import { dbConnection } from '@databases';
 import { UserEntity } from '@entities/users.entity';
 import errorMiddleware from '@middlewares/error.middleware';
-import { stream } from '@utils/logger';
+import { logger, stream } from '@utils/logger';
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
@@ -43,7 +43,12 @@ class App {
   }
 
   public listen() {
-    this.app.listen(this.port);
+    this.app.listen(this.port, () => {
+      logger.info(`=================================`);
+      logger.info(`======= ENV: ${this.env} =======`);
+      logger.info(`🚀 App listening on the port ${this.port}`);
+      logger.info(`=================================`);
+    });
   }
 
   public getServer() {
