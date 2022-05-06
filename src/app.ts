@@ -35,9 +35,9 @@ class App {
     this.env = process.env.NODE_ENV || 'development';
 
     this.env !== 'test' && this.connectToDatabase();
+    this.initializeSwagger(Controllers);
     this.initializeMiddlewares();
     this.initializeRoutes(Controllers);
-    this.initializeSwagger(Controllers);
     this.initializeErrorHandling();
     this.app.set('trust proxy', true);
   }
@@ -137,8 +137,8 @@ class App {
         },
       },
       info: {
-        description: 'Movie Booking',
-        title: 'Movie Cinema API',
+        description: 'Parking Lot',
+        title: 'Parking Lot API',
         version: '1.0.0',
       },
     });
