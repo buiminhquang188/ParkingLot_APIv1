@@ -122,5 +122,5 @@ definitions:
         description: user Password
 
 schemes:
- - https
+#  - https
  - http
