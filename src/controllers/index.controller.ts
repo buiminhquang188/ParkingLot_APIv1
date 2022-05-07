@@ -1,7 +1,5 @@
-import httpStatus from 'http-status';
-import { HttpException } from '@exceptions/HttpException';
-import { Controller, Get, ContentType } from 'routing-controllers';
-import { NextFunction } from 'express';
+import { Request, Response } from 'express';
+import { ContentType, Controller, Get, Req, Res } from 'routing-controllers';
 
 @Controller()
 export class IndexController {
@@ -11,9 +9,9 @@ export class IndexController {
     return 'Ok';
   }
 
-  // @Get('/favicon.ico')
-  // @ContentType('application/json')
-  // async getIcon(): Promise<any> {
-  //   return 'Ok';
-  // }
+  @Get('/favicon.ico')
+  @ContentType('application/json')
+  async getIcon(@Req() req: Request, @Res() res: Response): Promise<any> {
+    return res.sendStatus(204);
+  }
 }
