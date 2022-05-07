@@ -1,5 +1,4 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { MenuPermissionEntity } from './menuPermission.entity';
 
 @Entity('user_menu_permission_entity')
 export class UserRolePermissionEntity {
@@ -29,8 +28,6 @@ export class UserRolePermissionEntity {
 
   @Column({ type: 'char', default: 'Y' })
   isUse: string;
-
-  menuPermission?: MenuPermissionEntity;
 
   constructor(id: number, isUse: string, roleId?: string, userId?: number, menuPermissionId?: number, createBy?: number, updateBy?: number) {
     this.id = id;

@@ -13,13 +13,13 @@ export const paginate = async function (
   let res = null;
   if (sortBy) {
     res = await builder
-      .orderBy('createdAt', 'DESC')
-      .orderBy(sortBy, sortOrder?.trim() || 'ASC')
+      // .orderBy('createdAt', 'DESC')
+      .orderBy(`${JSON.stringify(sortBy)}`, sortOrder?.trim() || 'ASC')
       .skip(skip)
       .take(pageSize)
       .getMany();
   } else {
-    res = await builder.orderBy('createdAt', 'DESC').skip(skip).take(pageSize).getMany();
+    res = await builder.orderBy('"createdAt"', 'DESC').skip(skip).take(pageSize).getMany();
   }
   return {
     from: skip <= count ? skip + 1 : null,

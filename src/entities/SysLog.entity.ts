@@ -17,7 +17,7 @@ export class SysLogEntity {
   @Column({ nullable: true, length: 7 })
   method: string;
 
-  @Column({ nullable: true, length: 50 })
+  @Column({ nullable: true, length: 100 })
   url: string;
 
   @Column({ nullable: true, width: 3 })

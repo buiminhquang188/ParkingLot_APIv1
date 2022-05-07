@@ -1,6 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { MenuEntity } from './menu.entity';
 
 @Entity()
 export class MenuPermissionEntity {
@@ -20,6 +19,4 @@ export class MenuPermissionEntity {
 
   @CreateDateColumn()
   createdAt: Date;
-
-  menu?: MenuEntity;
 }

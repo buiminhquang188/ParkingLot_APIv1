@@ -1,4 +1,4 @@
-import { IsIn, IsNumber, IsOptional, Matches } from 'class-validator';
+import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 
 const sortOrders = ['ASC', 'DESC'] as const;
 type SortOrders = typeof sortOrders[number];
@@ -11,10 +11,7 @@ export class Pagination {
   @IsOptional()
   pageSize?: number;
 
-  @Matches(/^$|^[0-9a-zA-Z]+$|^[0-9a-zA-Z]+[.]+[0-9a-zA-Z]+$/, {
-    message:
-      'sortBy: only alphanumeric characters and a dot character are allowed. A dot character must be followed by at least an alphanumeric character.',
-  })
+  @IsString()
   @IsOptional()
   sortBy?: string;
 
