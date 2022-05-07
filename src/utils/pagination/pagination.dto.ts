@@ -1,4 +1,4 @@
-import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsIn } from 'class-validator';
 
 const sortOrders = ['ASC', 'DESC'] as const;
 type SortOrders = typeof sortOrders[number];
@@ -15,7 +15,9 @@ export class Pagination {
   @IsOptional()
   sortBy?: string;
 
+  
   @IsIn(sortOrders)
+  @IsString()
   @IsOptional()
-  sortOrder?: SortOrders;
+  sortOrder?: string;
 }

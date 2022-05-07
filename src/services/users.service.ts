@@ -1,20 +1,26 @@
-import bcrypt from 'bcrypt';
-import { getRepository } from 'typeorm';
-import { UpdateUserDto, CreateUserDto } from '@dtos/users.dto';
 import { UserEntity } from '@/entities/Users.entity';
+import { PaginationAwareObject } from '@/utils/pagination/helper/pagination';
+import { CreateUserDto, SearchUserDto, UpdateUserDto } from '@dtos/users.dto';
 import { HttpException } from '@exceptions/HttpException';
-import { Roles, User } from '@interfaces/users.interface';
+import { User } from '@interfaces/users.interface';
 import { isEmpty } from '@utils/util';
+import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
-import RoleEntity from '@entities/roles.entity';
+import { getRepository } from 'typeorm';
 
 class UserService {
   private users = UserEntity;
-  private roles = RoleEntity;
 
-  public async findAllUser(): Promise<User[]> {
-    const userRepository = getRepository(this.users);
-    const users: User[] = await userRepository.find();
+  public async findAllUser(searchParam: SearchUserDto): Promise<any> {
+    const userRepository = getRepository(this.users);    
+    const users = await userRepository
+      .createQueryBuilder()
+      .where((sub) => {
+        if (searchParam.username) {
+          sub.where('username ILIKE :username', { username: searchParam.username });
+        }
+      })
+      .paginate();
     return users;
   }
 
@@ -94,11 +100,11 @@ class UserService {
     return findUserData;
   }
 
-  public async getRoles() {
-    const roleRepository = getRepository(this.roles);
-    const rolesData: Roles[] = await roleRepository.find({ select: ['role', 'nameRole'] });
-    return rolesData;
-  }
+  // public async getRoles() {
+  //   const roleRepository = getRepository(this.roles);
+  //   const rolesData: Roles[] = await roleRepository.find({ select: ['role', 'nameRole'] });
+  //   return rolesData;
+  // }
 }
 
 export default UserService;

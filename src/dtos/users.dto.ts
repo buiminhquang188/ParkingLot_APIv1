@@ -1,3 +1,4 @@
+import { Pagination } from '@/utils/pagination/pagination.dto';
 import { Roles } from '@/utils/enum';
 import { IsAlpha, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
@@ -72,4 +73,22 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsEnum(Roles, { each: true })
   public roleID: Roles;
+}
+
+export class SearchUserDto extends Pagination {
+  @IsString()
+  @IsOptional()
+  username: string;
+
+  @IsString()
+  @IsOptional()
+  email: string;
+
+  @IsString()
+  @IsOptional()
+  tel: string;
+
+  @IsString()
+  @IsOptional()
+  status: string;
 }

@@ -24,7 +24,7 @@ export class UserEntity implements User {
     default: Role.USER,
     length: 15,
   })
-  roleId: string;
+  role_id: string;
 
   @Column({ nullable: true })
   lastPasswordChange: Date;

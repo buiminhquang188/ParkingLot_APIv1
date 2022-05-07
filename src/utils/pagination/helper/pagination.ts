@@ -11,15 +11,16 @@ export const paginate = async function (
   const calcule_last_page = count % pageSize;
   const last_page = calcule_last_page === 0 ? count / pageSize : Math.trunc(count / pageSize) + 1;
   let res = null;
+  
   if (sortBy) {
     res = await builder
       // .orderBy('createdAt', 'DESC')
-      .orderBy(`${JSON.stringify(sortBy)}`, sortOrder?.trim() || 'ASC')
+      .orderBy(sortBy, sortOrder)
       .skip(skip)
       .take(pageSize)
       .getMany();
   } else {
-    res = await builder.orderBy('"createdAt"', 'DESC').skip(skip).take(pageSize).getMany();
+    res = await builder.orderBy('"createdAt"', sortOrder).skip(skip).take(pageSize).getMany();
   }
   return {
     from: skip <= count ? skip + 1 : null,

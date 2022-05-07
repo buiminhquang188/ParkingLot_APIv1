@@ -16,14 +16,15 @@ declare module 'typeorm' {
  */
 export function pagination(req: Request, res: Response, next: NextFunction): void {
   SelectQueryBuilder.prototype.paginate = async function (pageSize?: number | null): Promise<PaginationAwareObject> {
-    const requestBody = req.body;
-    const paginationDto: Pagination = {
-      page: requestBody.page,
-      pageSize: requestBody.pageSize,
-      sortBy: requestBody.sortBy,
-      sortOrder: requestBody.sortOrder?.toUpperCase(),
-    };
+    const requestQuery: Pagination = req.query;
 
+    const paginationDto = {
+      page: requestQuery.page,
+      pageSize: requestQuery.pageSize,
+      sortBy: requestQuery.sortBy,
+      sortOrder: requestQuery.sortOrder?.toUpperCase(),
+    };
+    
     const current_page = paginationDto.page || 1;
     // If not set, then get from request, default to 15
     pageSize = paginationDto.pageSize || 15;

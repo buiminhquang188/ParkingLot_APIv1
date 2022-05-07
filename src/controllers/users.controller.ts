@@ -1,7 +1,8 @@
-import { CreateUserDto, UpdateUserDto } from '@dtos/users.dto';
+import { PaginationAwareObject } from '@/utils/pagination/helper/pagination';
+import { CreateUserDto, SearchUserDto, UpdateUserDto } from '@dtos/users.dto';
 import { Roles, User } from '@interfaces/users.interface';
 import userService from '@services/users.service';
-import { Authorized, Body, ContentType, Controller, CurrentUser, Delete, Get, Param, Post, Put } from 'routing-controllers';
+import { Authorized, Body, ContentType, Controller, CurrentUser, Delete, Get, Param, Post, Put, QueryParams } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 const { cloudinary } = require('../utils/cloudinary');
 @Controller()
@@ -12,11 +13,11 @@ class UsersController {
   private userService = new userService();
   private cloudinary = cloudinary;
 
-  @Get('/users')
+  @Post('/users')
   @Authorized()
   @ContentType('application/json')
-  async getUsers(): Promise<{ data: User[]; message: string }> {
-    const findAllUsersData: User[] = await this.userService.findAllUser();
+  async getUsers(@QueryParams() searchParam: SearchUserDto): Promise<{ data: any; message: string }> {
+    const findAllUsersData = await this.userService.findAllUser(searchParam);
 
     return { data: findAllUsersData, message: 'findAll' };
   }
@@ -30,7 +31,7 @@ class UsersController {
     return { data: findOneUserData, message: 'findOne' };
   }
 
-  @Post('/users')
+  @Post('/users/create-user')
   @Authorized()
   @ContentType('application/json')
   async createUser(@Body() userData: CreateUserDto, @CurrentUser() currentUser: User): Promise<{ data: User; message: string }> {
@@ -74,13 +75,13 @@ class UsersController {
     return { data: reverUserData, message: 'reverse user' };
   }
 
-  @Get('/usersRole')
-  @Authorized()
-  @ContentType('application/json')
-  async getRoles(): Promise<Roles[]> {
-    const roleData: Roles[] = await this.userService.getRoles();
-    return roleData;
-  }
+  // @Get('/usersRole')
+  // @Authorized()
+  // @ContentType('application/json')
+  // async getRoles(): Promise<Roles[]> {
+  //   const roleData: Roles[] = await this.userService.getRoles();
+  //   return roleData;
+  // }
 }
 
 export default UsersController;
