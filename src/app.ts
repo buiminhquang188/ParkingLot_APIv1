@@ -1,4 +1,3 @@
-import { UserEntity } from '@/entities/Users.entity';
 import { SECRET_KEY } from '@config';
 import { dbConnection } from '@databases';
 import errorMiddleware from '@middlewares/error.middleware';
@@ -24,6 +23,7 @@ import { HttpException } from './exceptions/HttpException';
 import { DataStoredInToken } from './interfaces/auth.interface';
 import SysLogService from './services/systemLoggers.service';
 import { pagination } from './utils/pagination';
+import { UserEntity } from '@/entities/Users.entity';
 process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
 
 
