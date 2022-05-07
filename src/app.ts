@@ -1,8 +1,6 @@
+import { UserEntity } from '@/entities/Users.entity';
 import { SECRET_KEY } from '@config';
-process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
-
 import { dbConnection } from '@databases';
-import { UserEntity } from '@entities/users.entity';
 import errorMiddleware from '@middlewares/error.middleware';
 import { logger, stream } from '@utils/logger';
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
@@ -15,19 +13,25 @@ import hpp from 'hpp';
 import httpStatus from 'http-status';
 import jwt from 'jsonwebtoken';
 import morgan from 'morgan';
+import json from 'morgan-json';
 import 'reflect-metadata';
 import { Action, getMetadataArgsStorage, useExpressServer } from 'routing-controllers';
 import { routingControllersToSpec } from 'routing-controllers-openapi';
 import swaggerUi from 'swagger-ui-express';
 import { createConnection, getRepository } from 'typeorm';
-import { CREDENTIALS, LOG_FORMAT, ORIGIN } from './config';
+import { CREDENTIALS, ORIGIN } from './config';
 import { HttpException } from './exceptions/HttpException';
 import { DataStoredInToken } from './interfaces/auth.interface';
+import SysLogService from './services/systemLoggers.service';
+import { pagination } from './utils/pagination';
+process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
+
 
 class App {
   public app: express.Application;
   public port: string | number;
   public env: string;
+  private sysLogService: SysLogService = new SysLogService();
 
   constructor(Controllers: Function[]) {
     this.app = express();
@@ -61,14 +65,29 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use(express.json());
-    this.app.use(morgan(LOG_FORMAT, { stream }));
+    morgan.token('body', (req, res) => JSON.stringify(req['body']));
+     //Format model morgan
+     const format = json({
+      method: ':method',
+      url: ':url',
+      status: ':status',
+      totalTime: ':total-time',
+      responseTime: ':response-time',
+      userAgent: ':user-agent',
+      reqBody: ':body',
+      token: ':req[Authorization]',
+      ip: ':remote-addr',
+    });
+    this.app.use(morgan(format, { stream }));
     this.app.use(cors({ origin: ORIGIN, credentials: CREDENTIALS }));
     this.app.use(hpp());
     this.app.use(helmet());
     this.app.use(compression());
     this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(pagination);
     this.app.use(cookieParser());
   }
+
 
   private initializeRoutes(controllers: Function[]) {
     useExpressServer(this.app, {

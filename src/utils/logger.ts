@@ -1,4 +1,6 @@
 import { LOG_DIR } from '@/config';
+import { LogMorgan } from '@/interfaces/logMorgan.interface';
+import SysLogService from '@/services/systemLoggers.service';
 import fs from 'fs';
 import path from 'path';
 import winston from 'winston';
@@ -11,6 +13,9 @@ if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
 }
 
+//sysLog service
+const _sysLog: SysLogService = new SysLogService();
+
 // Define log format
 const logFormat = winston.format.printf(({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`);
 
@@ -18,7 +23,7 @@ const logFormat = winston.format.printf(({ timestamp, level, message }) => `${ti
  * Log Level
  * error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6
  */
-const logger = winston.createLogger({
+export const logger = winston.createLogger({
   format: winston.format.combine(
     winston.format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss',
@@ -56,10 +61,14 @@ logger.add(
   }),
 );
 
-const stream = {
-  write: (message: string) => {
-    logger.info(message.substring(0, message.lastIndexOf('\n')));
+export const stream = {
+  write: (logdata: any) => {
+    const data = JSON.parse(logdata) as LogMorgan;
+    data.reqBody = JSON.parse(data.reqBody);
+    
+    if (data.method !== 'OPTIONS') {
+      _sysLog.create(data);
+    }
+    logger.info(`${data.method} ${data.url} ${data.status} >>> ${data.totalTime}ms`);
   },
 };
-
-export { logger, stream };

@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { getRepository } from 'typeorm';
 import { UserCreateDto, LoginUserDto } from '@dtos/users.dto';
-import { UserEntity } from '@entities/users.entity';
+import { UserEntity } from '@/entities/Users.entity';
 import { HttpException } from '@exceptions/HttpException';
 import { DataStoredInToken, TokenData } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
@@ -16,7 +16,6 @@ class AuthService {
 
   public async signup(userData: UserCreateDto) {
     if (isEmpty(userData)) throw new HttpException(httpStatus.BAD_REQUEST, 'Request is empty');
-    console.log(userData);
 
     const userRepository = getRepository(this.users);
     const findUser: User = await userRepository.findOne({ where: { email: userData.email } });

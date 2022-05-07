@@ -25,8 +25,8 @@ class AuthController {
       },
     },
   })
-  @ContentType('application/json')
   @Body({ required: true })
+  @ContentType('application/json')
   async signUp(@Body() userData: UserCreateDto): Promise<any> {
     const signUpUserData: User = await this.authService.signup(userData);
 
@@ -50,7 +50,6 @@ class AuthController {
     },
   })
   @ContentType('application/json')
-  @Body({ required: true })
   async Login(@Body() userData: LoginUserDto): Promise<{ data: any; message: string }> {
     const tokenData = await this.authService.login(userData);
 

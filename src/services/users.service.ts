@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { getRepository } from 'typeorm';
 import { UpdateUserDto, CreateUserDto } from '@dtos/users.dto';
-import { UserEntity } from '@entities/users.entity';
+import { UserEntity } from '@/entities/Users.entity';
 import { HttpException } from '@exceptions/HttpException';
 import { Roles, User } from '@interfaces/users.interface';
 import { isEmpty } from '@utils/util';
