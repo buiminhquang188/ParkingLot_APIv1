@@ -1,3 +1,5 @@
+// import { pagination } from './utils/pagination';
+import { UserEntity } from '@/entities/Users.entity';
 import { SECRET_KEY } from '@config';
 import { dbConnection } from '@databases';
 import errorMiddleware from '@middlewares/error.middleware';
@@ -17,20 +19,18 @@ import 'reflect-metadata';
 import { Action, getMetadataArgsStorage, useExpressServer } from 'routing-controllers';
 import { routingControllersToSpec } from 'routing-controllers-openapi';
 import swaggerUi from 'swagger-ui-express';
-import { createConnection, getRepository } from 'typeorm';
 import { CREDENTIALS, ORIGIN } from './config';
 import { HttpException } from './exceptions/HttpException';
 import { DataStoredInToken } from './interfaces/auth.interface';
 import SysLogService from './services/systemLoggers.service';
-import { pagination } from './utils/pagination';
-import { UserEntity } from '@/entities/Users.entity';
 process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
-
 
 class App {
   public app: express.Application;
   public port: string | number;
   public env: string;
+
+  private userRepository = dbConnection.getRepository(UserEntity);
   private sysLogService: SysLogService = new SysLogService();
 
   constructor(Controllers: Function[]) {
@@ -60,14 +60,21 @@ class App {
   }
 
   private connectToDatabase() {
-    createConnection(dbConnection);
+    dbConnection
+      .initialize()
+      .then(() => {
+        console.log('Data Source has been initialized!');
+      })
+      .catch((err) => {
+        console.error('Error during Data Source initialization', err);
+      });
   }
 
   private initializeMiddlewares() {
     this.app.use(express.json());
     morgan.token('body', (req, res) => JSON.stringify(req['body']));
-     //Format model morgan
-     const format = json({
+    //Format model morgan
+    const format = json({
       method: ':method',
       url: ':url',
       status: ':status',
@@ -84,10 +91,9 @@ class App {
     this.app.use(helmet());
     this.app.use(compression());
     this.app.use(express.urlencoded({ extended: true }));
-    this.app.use(pagination);
+    // this.app.use(pagination);
     this.app.use(cookieParser());
   }
-
 
   private initializeRoutes(controllers: Function[]) {
     useExpressServer(this.app, {
@@ -104,8 +110,7 @@ class App {
           const verificationResponse = jwt.verify(token, secretKey) as DataStoredInToken;
           const userId = verificationResponse.id;
 
-          const userRepository = getRepository(UserEntity);
-          const findUser: UserEntity = await userRepository.findOne(userId);
+          const findUser: UserEntity = await this.userRepository.findOne({ where: { id: userId } });
           if (findUser) {
             return true;
           }
@@ -121,8 +126,7 @@ class App {
           const verificationResponse = jwt.verify(token, secretKey) as DataStoredInToken;
           const userId = verificationResponse.id;
 
-          const userRepository = getRepository(UserEntity);
-          const findUser: UserEntity = await userRepository.findOne(userId);
+          const findUser: UserEntity = await this.userRepository.findOne({ where: { id: userId } });
 
           return findUser;
         } catch (error) {
