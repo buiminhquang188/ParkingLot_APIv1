@@ -1,7 +1,7 @@
+import { dbConnection } from '@databases';
 import { SECRET_KEY } from '@config';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { getRepository } from 'typeorm';
 import { UserCreateDto, LoginUserDto } from '@dtos/users.dto';
 import { UserEntity } from '@/entities/Users.entity';
 import { HttpException } from '@exceptions/HttpException';
@@ -12,25 +12,24 @@ import { Roles } from '@/utils/enum';
 import httpStatus from 'http-status';
 
 class AuthService {
-  public users = UserEntity;
+  private userRepository = dbConnection.getRepository(UserEntity)
 
   public async signup(userData: UserCreateDto) {
     if (isEmpty(userData)) throw new HttpException(httpStatus.BAD_REQUEST, 'Request is empty');
 
-    const userRepository = getRepository(this.users);
-    const findUser: User = await userRepository.findOne({ where: { email: userData.email } });
+    
+    const findUser: User = await this.userRepository.findOne({ where: { email: userData.email } });
     if (findUser) throw new HttpException(httpStatus.CONFLICT, `You're email ${userData.email} already exists`);
 
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-    const createUserData: User = await userRepository.save({ ...userData, password: hashedPassword, roleID: Roles.USER });
+    const createUserData: User = await this.userRepository.save({ ...userData, password: hashedPassword, roleID: Roles.USER });
     return createUserData;
   }
 
   public async login(userData: LoginUserDto) {
     if (isEmpty(userData)) throw new HttpException(httpStatus.BAD_REQUEST, 'Request is empty');
 
-    const userRepository = getRepository(this.users);
-    const findUser: User = await userRepository.findOne({ select: ['email', 'password'], where: { email: userData.email } });
+    const findUser: User = await this.userRepository.findOne({ select: ['email', 'password'], where: { email: userData.email } });
     if (!findUser) throw new HttpException(httpStatus.CONFLICT, `You're email ${userData.email} not found`);
 
     const isPasswordMatching: boolean = await bcrypt.compare(userData.password, findUser.password);
@@ -44,8 +43,7 @@ class AuthService {
   public async logout(userData: User) {
     if (isEmpty(userData)) throw new HttpException(httpStatus.BAD_REQUEST, "You're not user");
 
-    const userRepository = getRepository(this.users);
-    const findUser: User = await userRepository.findOne({ where: { email: userData.email } });
+    const findUser: User = await this.userRepository.findOne({ where: { email: userData.email } });
     if (!findUser) throw new HttpException(httpStatus.CONFLICT, "You're not user");
   }
 

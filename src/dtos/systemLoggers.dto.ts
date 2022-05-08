@@ -1,7 +1,7 @@
-import { Pagination } from '@/utils/pagination/pagination.dto';
+// import { Pagination } from '@/utils/pagination/pagination.dto';
 import { IsOptional, IsString } from 'class-validator';
 
-export class SystemLoggersDto extends Pagination {
+export class SystemLoggersDto {
   @IsString()
   @IsOptional()
   public method: string;

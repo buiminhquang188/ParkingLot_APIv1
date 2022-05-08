@@ -1,26 +1,26 @@
+import { dbConnection } from '@databases';
 import { UserEntity } from '@/entities/Users.entity';
-import * as pagination from '@/utils/pagination/helper/pagination';
+// import * as pagination from '@/utils/pagination/helper/pagination';
 import { CreateUserDto, SearchUserDto, UpdateUserDto } from '@dtos/users.dto';
 import { HttpException } from '@exceptions/HttpException';
 import { User } from '@interfaces/users.interface';
 import { isEmpty } from '@utils/util';
 import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
-import { Brackets, getRepository } from 'typeorm';
+import { Brackets } from 'typeorm';
 
 class UserService {
-  private users = UserEntity;
+  private userRepository = dbConnection.getRepository(UserEntity);
 
   public async findAllUser(searchParam: SearchUserDto): Promise<any> {
     const { username, email, status, tel } = searchParam;
-    const userRepository = getRepository(this.users);
-    const users = await userRepository
+    const users = await this.userRepository
       .createQueryBuilder()
       .where((sub) => {
         if (username) {
           sub.where('username ILIKE :username', { username });
         } else {
-          sub.select('username')
+          sub.select('username');
         }
       })
       .andWhere(
@@ -34,20 +34,19 @@ class UserService {
         new Brackets((sub) => {
           if (tel) {
             sub.where('tel ILIKE :tel', { tel });
-          }
-          else{
-            sub.where('tel IL')
+          } else {
+            sub.where('tel IL');
           }
         }),
       )
-      .paginate();
+      .getMany();
     return users;
   }
 
   public async findUserById(userId: number) {
     if (isEmpty(userId)) throw new HttpException(httpStatus.BAD_REQUEST, 'ID must not empty');
-    const userRepository = getRepository(this.users);
-    const findUser: User = await userRepository.findOne({ where: { id: userId } });
+
+    const findUser: User = await this.userRepository.findOne({ where: { id: userId } });
     if (!findUser) throw new HttpException(httpStatus.CONFLICT, 'User not found or has been deleted');
 
     return findUser;
@@ -56,37 +55,37 @@ class UserService {
   public async createUser(userData: CreateUserDto, currentUser: User) {
     if (isEmpty(userData)) throw new HttpException(httpStatus.BAD_REQUEST, 'Request must not empty');
 
-    const userRepository = getRepository(this.users);
+
 
     const hashedPassword = await bcrypt.hash('newuser', 10);
-    const createUserData: User = await userRepository.save({ ...userData, password: hashedPassword, createdBy: currentUser.id });
+    const createUserData: User = await this.userRepository.save({ ...userData, password: hashedPassword, createdBy: currentUser.id });
     return createUserData;
   }
 
   public async updateUser(userData: UpdateUserDto, currentUser: User) {
     if (isEmpty(userData)) throw new HttpException(httpStatus.BAD_REQUEST, 'Request must not empty');
 
-    const userRepository = getRepository(this.users);
-    const findUser: User = await userRepository.findOne({ where: { id: userData.id } });
+
+    const findUser: User = await this.userRepository.findOne({ where: { id: userData.id } });
     if (!findUser) throw new HttpException(httpStatus.CONFLICT, 'User not found or has been deleted');
 
-    await userRepository.update(userData.id, { ...userData, updatedBy: currentUser.id });
+    await this.userRepository.update(userData.id, { ...userData, updatedBy: currentUser.id });
 
-    const updateUser: User = await userRepository.findOne({ where: { id: userData.id } });
+    const updateUser: User = await this.userRepository.findOne({ where: { id: userData.id } });
     return updateUser;
   }
 
   public async deleteUser(userId: number, currentUser: User) {
     if (isEmpty(userId)) throw new HttpException(httpStatus.BAD_REQUEST, 'ID must not empty');
 
-    const userRepository = getRepository(this.users);
-    const findUser: User = await userRepository.findOne({ where: { id: userId } });
+
+    const findUser: User = await this.userRepository.findOne({ where: { id: userId } });
     if (!findUser) throw new HttpException(httpStatus.CONFLICT, 'User not found or has been deleted');
 
-    await userRepository.update(userId, { updatedBy: currentUser.id });
-    await userRepository.softDelete({ id: userId });
+    await this.userRepository.update(userId, { updatedBy: currentUser.id });
+    await this.userRepository.softDelete({ id: userId });
 
-    const deletedUser: User = await userRepository.findOne({ where: { id: userId } });
+    const deletedUser: User = await this.userRepository.findOne({ where: { id: userId } });
 
     return deletedUser;
   }
@@ -94,28 +93,28 @@ class UserService {
   public async resetPassword(userId: number) {
     if (isEmpty(userId)) throw new HttpException(httpStatus.BAD_REQUEST, 'ID must not empty');
 
-    const userRepository = getRepository(this.users);
-    const findUser: User = await userRepository.findOne({ where: { id: userId } });
+
+    const findUser: User = await this.userRepository.findOne({ where: { id: userId } });
     if (!findUser) throw new HttpException(httpStatus.CONFLICT, 'User not found or has been deleted');
 
     const hashedPassword = await bcrypt.hash('newuser', 10);
-    await userRepository.update(userId, { password: hashedPassword });
+    await this.userRepository.update(userId, { password: hashedPassword });
 
-    const updateUser: User = await userRepository.findOne({ where: { id: userId } });
+    const updateUser: User = await this.userRepository.findOne({ where: { id: userId } });
     return updateUser;
   }
 
   public async reverseUser(userId: number) {
     if (isEmpty(userId)) throw new HttpException(httpStatus.BAD_REQUEST, 'ID must not empty');
 
-    const userRepository = getRepository(this.users);
-    const reverseUserData: { deletedAt: Date } = await userRepository.findOne({ where: { id: userId }, withDeleted: true });
+
+    const reverseUserData: { deletedAt: Date } = await this.userRepository.findOne({ where: { id: userId }, withDeleted: true });
 
     if (!reverseUserData) throw new HttpException(httpStatus.CONFLICT, 'User not found');
     if (reverseUserData.deletedAt === null) throw new HttpException(httpStatus.CONFLICT, 'User has been deleted');
 
-    await userRepository.update(userId, { deletedAt: null });
-    const findUserData: User = await userRepository.findOne({ where: { id: userId } });
+    await this.userRepository.update(userId, { deletedAt: null });
+    const findUserData: User = await this.userRepository.findOne({ where: { id: userId } });
 
     return findUserData;
   }
