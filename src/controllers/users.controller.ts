@@ -13,7 +13,7 @@ class UsersController {
   private userService = new userService();
   private cloudinary = cloudinary;
 
-  @Post('/users')
+  @Get('/users')
   @Authorized()
   @ContentType('application/json')
   async getUsers(@QueryParams() searchParam: SearchUserDto): Promise<{ data: any; message: string }> {

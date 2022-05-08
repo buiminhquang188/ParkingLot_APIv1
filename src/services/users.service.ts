@@ -1,25 +1,45 @@
 import { UserEntity } from '@/entities/Users.entity';
-import { PaginationAwareObject } from '@/utils/pagination/helper/pagination';
+import * as pagination from '@/utils/pagination/helper/pagination';
 import { CreateUserDto, SearchUserDto, UpdateUserDto } from '@dtos/users.dto';
 import { HttpException } from '@exceptions/HttpException';
 import { User } from '@interfaces/users.interface';
 import { isEmpty } from '@utils/util';
 import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
-import { getRepository } from 'typeorm';
+import { Brackets, getRepository } from 'typeorm';
 
 class UserService {
   private users = UserEntity;
 
   public async findAllUser(searchParam: SearchUserDto): Promise<any> {
-    const userRepository = getRepository(this.users);    
+    const { username, email, status, tel } = searchParam;
+    const userRepository = getRepository(this.users);
     const users = await userRepository
       .createQueryBuilder()
       .where((sub) => {
-        if (searchParam.username) {
-          sub.where('username ILIKE :username', { username: searchParam.username });
+        if (username) {
+          sub.where('username ILIKE :username', { username });
+        } else {
+          sub.select('username')
         }
       })
+      .andWhere(
+        new Brackets((sub) => {
+          if (email) {
+            sub.where('email ILIKE :email', { email });
+          }
+        }),
+      )
+      .andWhere(
+        new Brackets((sub) => {
+          if (tel) {
+            sub.where('tel ILIKE :tel', { tel });
+          }
+          else{
+            sub.where('tel IL')
+          }
+        }),
+      )
       .paginate();
     return users;
   }

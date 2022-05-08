@@ -44,7 +44,7 @@
     "swagger-jsdoc": "^6.0.0",
     "swagger-ui-express": "^4.1.6",
     "toad-scheduler": "^1.6.0",
-    "typeorm": "^0.2.34",
+    "typeorm": "^0.3.6",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.5"
   },
