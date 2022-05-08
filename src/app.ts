@@ -23,6 +23,7 @@ import { CREDENTIALS, ORIGIN } from './config';
 import { HttpException } from './exceptions/HttpException';
 import { DataStoredInToken } from './interfaces/auth.interface';
 import SysLogService from './services/systemLoggers.service';
+import { pagination } from './utils/pagination';
 process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
 
 class App {
@@ -91,7 +92,7 @@ class App {
     this.app.use(helmet());
     this.app.use(compression());
     this.app.use(express.urlencoded({ extended: true }));
-    // this.app.use(pagination);
+    this.app.use(pagination);
     this.app.use(cookieParser());
   }
 
