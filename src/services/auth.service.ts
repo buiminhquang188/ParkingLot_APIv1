@@ -8,13 +8,13 @@ import { HttpException } from '@exceptions/HttpException';
 import { DataStoredInToken, TokenData } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
 import { isEmpty } from '@utils/util';
-import { Roles } from '@/utils/enum';
+import { Role } from '@/utils/enums';
 import httpStatus from 'http-status';
 
 class AuthService {
   private userRepository = dbConnection.getRepository(UserEntity)
 
-  public async signup(userData: UserCreateDto) {
+  public async signUp(userData: UserCreateDto) {
     if (isEmpty(userData)) throw new HttpException(httpStatus.BAD_REQUEST, 'Request is empty');
 
     
@@ -22,7 +22,7 @@ class AuthService {
     if (findUser) throw new HttpException(httpStatus.CONFLICT, `You're email ${userData.email} already exists`);
 
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-    const createUserData: User = await this.userRepository.save({ ...userData, password: hashedPassword, roleID: Roles.USER });
+    const createUserData: User = await this.userRepository.save({ ...userData, password: hashedPassword, roleID: Role.USER });
     return createUserData;
   }
 

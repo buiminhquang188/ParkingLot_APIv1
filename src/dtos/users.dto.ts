@@ -1,5 +1,5 @@
 // import { Pagination } from '@/utils/pagination/pagination.dto';
-import { Roles } from '@/utils/enum';
+import { Role } from '@/utils/enums';
 import { IsAlpha, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UserCreateDto {
@@ -54,8 +54,8 @@ export class UpdateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsEnum(Roles, { each: true })
-  public roleID: Roles;
+  @IsEnum(Role, { each: true })
+  public roleID: Role;
 }
 
 export class CreateUserDto {
@@ -71,8 +71,8 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsEnum(Roles, { each: true })
-  public roleID: Roles;
+  @IsEnum(Role, { each: true })
+  public roleID: Role;
 }
 
 export class SearchUserDto {

@@ -22,7 +22,6 @@ import swaggerUi from 'swagger-ui-express';
 import { CREDENTIALS, ORIGIN } from './config';
 import { HttpException } from './exceptions/HttpException';
 import { DataStoredInToken } from './interfaces/auth.interface';
-import SysLogService from './services/systemLoggers.service';
 import { pagination } from './utils/pagination';
 process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
 
@@ -32,7 +31,6 @@ class App {
   public env: string;
 
   private userRepository = dbConnection.getRepository(UserEntity);
-  private sysLogService: SysLogService = new SysLogService();
 
   constructor(Controllers: Function[]) {
     this.app = express();
