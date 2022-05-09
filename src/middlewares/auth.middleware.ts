@@ -1,10 +1,10 @@
-import { getRepository } from 'typeorm';
-import { NextFunction, Response } from 'express';
-import { verify } from 'jsonwebtoken';
-import { SECRET_KEY } from '@config';
 import { UserEntity } from '@/entities/Users.entity';
+import { SECRET_KEY } from '@config';
+import { dbConnection } from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { DataStoredInToken, RequestWithUser } from '@interfaces/auth.interface';
+import { NextFunction, Response } from 'express';
+import { verify } from 'jsonwebtoken';
 
 const authMiddleware = async (req: RequestWithUser, res: Response, next: NextFunction) => {
   try {
@@ -13,8 +13,8 @@ const authMiddleware = async (req: RequestWithUser, res: Response, next: NextFun
     if (Authorization) {
       const secretKey: string = SECRET_KEY;
       const { id } = (await verify(Authorization, secretKey)) as DataStoredInToken;
-      const userRepository = getRepository(UserEntity)
-      const findUser = await userRepository.findOne(id, { select: ['id', 'email', 'password'] });
+      const userRepository = dbConnection.getRepository(UserEntity);
+      const findUser = await userRepository.findOne({ where: { id }, select: ['id', 'email', 'password'] });
 
       if (findUser) {
         req.user = findUser;

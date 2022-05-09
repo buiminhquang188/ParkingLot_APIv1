@@ -28,7 +28,7 @@ class AuthController {
   @Body({ required: true })
   @ContentType('application/json')
   async signUp(@Body() userData: UserCreateDto): Promise<any> {
-    const signUpUserData: User = await this.authService.signup(userData);
+    const signUpUserData: User = await this.authService.signUp(userData);
 
     return signUpUserData;
   }
