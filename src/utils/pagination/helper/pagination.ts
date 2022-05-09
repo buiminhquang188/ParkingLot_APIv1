@@ -1,3 +1,4 @@
+import { isCamelCase } from './../../util';
 import { SelectQueryBuilder } from 'typeorm';
 export const paginate = async function (
   builder: SelectQueryBuilder<any>,
@@ -11,7 +12,8 @@ export const paginate = async function (
   const calcule_last_page = count % pageSize;
   const last_page = calcule_last_page === 0 ? count / pageSize : Math.trunc(count / pageSize) + 1;
   let res = null;
-  
+  if (isCamelCase(sortBy)) sortBy = JSON.stringify(sortBy);
+
   if (sortBy) {
     res = await builder
       // .orderBy('createdAt', 'DESC')
