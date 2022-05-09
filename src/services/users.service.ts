@@ -1,3 +1,4 @@
+import { isCamelCase } from './../utils/util';
 import { dbConnection } from '@databases';
 import { UserEntity } from '@/entities/Users.entity';
 // import * as pagination from '@/utils/pagination/helper/pagination';
@@ -14,6 +15,7 @@ class UserService {
 
   public async findAllUser(searchParam: SearchUserDto): Promise<any> {
     const { username, email, status, tel } = searchParam;
+    
     const users = await this.userRepository
       .createQueryBuilder()
       .withDeleted()
@@ -47,7 +49,6 @@ class UserService {
           }
         }),
       )
-      .orderBy('"createdAt"', 'ASC')
       .paginate();
     return users;
   }
