@@ -6,10 +6,6 @@ const type = ['IN', 'OUT'] as const;
 export class VehicleTypeDto {
   @IsString()
   @IsNotEmpty()
-  twoFirstDigits: string;
-
-  @IsString()
-  @IsNotEmpty()
   vehicleColor: string;
 
   @IsString()
@@ -22,7 +18,15 @@ export class VehicleTypeDto {
 
   @IsString()
   @IsNotEmpty()
+  twoFirstDigits: string;
+
+  @IsString()
+  @IsNotEmpty()
   fourLastDigits: string;
+
+  @IsString()
+  @IsNotEmpty()
+  licensePlates: string;
 }
 
 export class VehicleDto {
