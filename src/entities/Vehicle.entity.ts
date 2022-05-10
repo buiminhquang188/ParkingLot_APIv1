@@ -35,12 +35,13 @@ export class VehicleEntity {
   @VersionColumn()
   version: number;
 
-  constructor(twoDigits: string, color: string, otherDigits: string, block: string, slotId: string, isIn: string) {
+  constructor(twoDigits: string, color: string, otherDigits: string, block: string, slotId: string, isIn: string, licensePlates: string) {
     this.twoDigits = twoDigits;
     this.color = color;
     this.otherDigits = otherDigits;
     this.block = block;
     this.slotId = slotId;
     this.isIn = isIn;
+    this.licensePlates = licensePlates;
   }
 }
