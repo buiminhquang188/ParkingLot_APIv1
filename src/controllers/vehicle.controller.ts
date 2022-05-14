@@ -1,4 +1,4 @@
-import { VehicleDto } from './../dtos/vehicle.dto';
+import { VehicleDto, ParkingVehicleDto } from './../dtos/vehicle.dto';
 import { ContentType, Controller, Post, Body, Patch } from 'routing-controllers';
 import { VehicleService } from './../services/vehicle.service';
 import { OpenAPI } from 'routing-controllers-openapi';
@@ -30,14 +30,14 @@ export class VehicleController {
       content: {
         'application/json': {
           schema: {
-            $ref: '#/components/schemas/VehicleDto',
+            $ref: '#/components/schemas/ParkingVehicleDto',
           },
         },
       },
     },
   })
   @ContentType('application/json')
-  public async vehicleGetOut(@Body() requestBody: VehicleDto) {    
+  public async vehicleGetOut(@Body() requestBody: ParkingVehicleDto) {    
     return await this.vehicleService.updateVehicleLocation(requestBody);
   }
 }
