@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
 import { HttpException } from '@exceptions/HttpException';
 import { UserEntity } from '@/entities/Users.entity';
-import { VehicleDto } from './../dtos/vehicle.dto';
+import { VehicleDto, ParkingVehicleDto } from './../dtos/vehicle.dto';
 import { VehicleEntity } from './../entities/Vehicle.entity';
 import { dbConnection } from '@/databases';
 
@@ -33,22 +33,19 @@ export class VehicleService {
     return saveValue;
   }
 
-  public async updateVehicleLocation(requestBody: VehicleDto) {    
-    const { id, type, username } = requestBody;
-    if (type === 'OUT') throw new HttpException(httpStatus.CONFLICT, 'Vehicle is out of the parking lot');
+  public async updateVehicleLocation(requestBody: ParkingVehicleDto) {
+    const { licensePlates, blockId, slotId, type } = requestBody;
+    if (type !== 'PARKING') throw new HttpException(httpStatus.CONFLICT, 'Vehicle is out of the parking lot');
 
-    const findUser = this.userRepository.findOne({ where: { email: username } });
-    if (!findUser) throw new HttpException(httpStatus.CONFLICT, `${username} not found`);
-
-    const findLocation = await this.vehicleRepository.findOne({ where: { block: id.block, slotId: id.slotId, isIn: 'IN' } });
+    const findLocation = await this.vehicleRepository.findOne({ where: { block: blockId, slotId: slotId, isIn: 'IN' } });
     if (findLocation) throw new HttpException(httpStatus.CONFLICT, `Block: ${findLocation.block} and SlotId: ${findLocation.slotId} has occupied`);
 
-    const findVehicle = await this.vehicleRepository.findOne({ where: { licensePlates: id.licensePlates, isIn: 'IN' } });
+    const findVehicle = await this.vehicleRepository.findOne({ where: { licensePlates, isIn: 'IN' } });
     if (!findVehicle) throw new HttpException(httpStatus.CONFLICT, `Vehicle has license ${findVehicle.licensePlates} doesn't exist in parking lot`);
 
-    await this.vehicleRepository.update({ licensePlates: findVehicle.licensePlates }, { block: id.block, slotId: id.slotId });
+    await this.vehicleRepository.update({ licensePlates: findVehicle.licensePlates }, { block: blockId, slotId, isIn: type });
 
-    const findNewSlot = await this.vehicleRepository.findOne({ where: { licensePlates: id.licensePlates, isIn: 'IN' } });
+    const findNewSlot = await this.vehicleRepository.findOne({ where: { licensePlates: licensePlates, isIn: type } });
 
     return findNewSlot;
   }

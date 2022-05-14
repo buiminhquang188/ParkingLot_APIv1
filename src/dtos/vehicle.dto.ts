@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsDefined, IsIn, IsNotEmpty, IsNotEmptyObject, IsString, ValidateNested } from 'class-validator';
 import 'reflect-metadata';
-const type = ['IN', 'OUT'] as const;
+const type = ['IN', 'PARKING', 'OUT'] as const;
 
 export class VehicleTypeDto {
   @IsString()
@@ -43,4 +43,22 @@ export class VehicleDto {
   @ValidateNested()
   @Type(() => VehicleTypeDto)
   id!: VehicleTypeDto;
+}
+
+export class ParkingVehicleDto {
+  @IsIn(type)
+  @IsNotEmpty()
+  type: string;
+
+  @IsString()
+  @IsNotEmpty()
+  licensePlates: string;
+
+  @IsString()
+  @IsNotEmpty()
+  blockId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  slotId: string;
 }
