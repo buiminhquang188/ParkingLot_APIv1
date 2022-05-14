@@ -24,7 +24,7 @@ export class VehicleController {
     return await this.vehicleService.vehicleGetIn(requestBody);
   }
 
-  @Patch('/vehicle/getOut')
+  @Patch('/vehicle/parking')
   @OpenAPI({
     requestBody: {
       content: {
@@ -37,7 +37,7 @@ export class VehicleController {
     },
   })
   @ContentType('application/json')
-  public async vehicleGetOut(@Body() requestBody: VehicleDto) {
+  public async vehicleGetOut(@Body() requestBody: VehicleDto) {    
     return await this.vehicleService.updateVehicleLocation(requestBody);
   }
 }

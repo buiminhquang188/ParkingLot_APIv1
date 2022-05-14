@@ -19,12 +19,21 @@ export class VehicleService {
     const findVehicle = await this.vehicleRepository.findOne({ where: { licensePlates: id.licensePlates, isIn: 'IN' } });
     if (findVehicle) throw new HttpException(httpStatus.CONFLICT, `${id.licensePlates} is available in park`);
 
-    const vehicleValue = new VehicleEntity(id.twoFirstDigits, id.vehicleColor, id.block, id.slotId, id.fourLastDigits, type, id.licensePlates);
+    const vehicleValue = new VehicleEntity(
+      id.twoFirstDigits,
+      id.vehicleColor,
+      id.block,
+      id.slotId,
+      id.fourLastDigits,
+      type,
+      id.licensePlates,
+      findUser.email,
+    );
     const saveValue = await this.vehicleRepository.save(vehicleValue);
     return saveValue;
   }
 
-  public async updateVehicleLocation(requestBody: VehicleDto) {
+  public async updateVehicleLocation(requestBody: VehicleDto) {    
     const { id, type, username } = requestBody;
     if (type === 'OUT') throw new HttpException(httpStatus.CONFLICT, 'Vehicle is out of the parking lot');
 
