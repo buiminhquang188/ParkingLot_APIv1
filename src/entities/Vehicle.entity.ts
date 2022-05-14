@@ -5,6 +5,9 @@ export class VehicleEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
+  @Column({ nullable: false })
+  username: string;
+
   @Column({ nullable: true })
   licensePlates: string;
 
@@ -35,7 +38,16 @@ export class VehicleEntity {
   @VersionColumn()
   version: number;
 
-  constructor(twoDigits: string, color: string, otherDigits: string, block: string, slotId: string, isIn: string, licensePlates: string) {
+  constructor(
+    twoDigits: string,
+    color: string,
+    otherDigits: string,
+    block: string,
+    slotId: string,
+    isIn: string,
+    licensePlates: string,
+    username: string,
+  ) {
     this.twoDigits = twoDigits;
     this.color = color;
     this.otherDigits = otherDigits;
@@ -43,5 +55,6 @@ export class VehicleEntity {
     this.slotId = slotId;
     this.isIn = isIn;
     this.licensePlates = licensePlates;
+    this.username = username;
   }
 }

@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsDefined, IsIn, IsNotEmpty, IsNotEmptyObject, IsString, ValidateNested } from 'class-validator';
-import "reflect-metadata";
+import 'reflect-metadata';
 const type = ['IN', 'OUT'] as const;
 
 export class VehicleTypeDto {
