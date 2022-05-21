@@ -10,14 +10,6 @@ export class VehicleTypeDto {
 
   @IsString()
   @IsNotEmpty()
-  block: string;
-
-  @IsString()
-  @IsNotEmpty()
-  slotId: string;
-
-  @IsString()
-  @IsNotEmpty()
   twoFirstDigits: string;
 
   @IsString()
@@ -30,10 +22,6 @@ export class VehicleTypeDto {
 }
 
 export class VehicleDto {
-  @IsString()
-  @IsNotEmpty()
-  username: string;
-
   @IsIn(type)
   @IsNotEmpty()
   type: string;

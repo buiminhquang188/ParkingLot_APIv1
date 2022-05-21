@@ -102,6 +102,13 @@ class UsersController {
     return userProfile;
   }
 
+  @Get('/user/vehicle-profile')
+  @Authorized()
+  @ContentType('application/json')
+  public async userVehicleProfile(@CurrentUser() currentUser: User): Promise<any> {
+    const userVehicleProfile = await this.userService.getUserVehicle(currentUser);
+    return userVehicleProfile;
+  }
   // @Get('/usersRole')
   // @Authorized()
   // @ContentType('application/json')

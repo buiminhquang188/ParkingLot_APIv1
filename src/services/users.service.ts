@@ -1,3 +1,4 @@
+import { VehicleEntity } from './../entities/Vehicle.entity';
 import { UserEntity } from '@/entities/Users.entity';
 import { dbConnection } from '@databases';
 // import * as pagination from '@/utils/pagination/helper/pagination';
@@ -11,6 +12,7 @@ import { Brackets } from 'typeorm';
 
 class UserService {
   private userRepository = dbConnection.getRepository(UserEntity);
+  private vehicleRepository = dbConnection.getRepository(VehicleEntity);
 
   public async findAllUser(searchParam: SearchUserDto): Promise<any> {
     const { username, email, status, tel } = searchParam;
@@ -136,6 +138,13 @@ class UserService {
     const findUser = await this.userRepository.findOne({ where: { id } });
 
     return findUser;
+  }
+
+  public async getUserVehicle(currentUser: User) {
+    const { email } = currentUser;
+    const userVehicle = await this.vehicleRepository.findOne({ where: { username: email, isIn: 'PARKING' } });
+    if (!userVehicle) throw new HttpException(httpStatus.BAD_REQUEST, `Vehicle of user ${currentUser.email} is not in parking lot`);
+    return userVehicle;
   }
 }
 
