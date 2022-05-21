@@ -1,46 +1,37 @@
+import { User } from './../interfaces/users.interface';
 import httpStatus from 'http-status';
 import { HttpException } from '@exceptions/HttpException';
 import { UserEntity } from '@/entities/Users.entity';
 import { VehicleDto, ParkingVehicleDto } from './../dtos/vehicle.dto';
 import { VehicleEntity } from './../entities/Vehicle.entity';
 import { dbConnection } from '@/databases';
-
+import { ParkingStatus } from '@/utils/enums';
 export class VehicleService {
   private vehicleRepository = dbConnection.getRepository(VehicleEntity);
   private userRepository = dbConnection.getRepository(UserEntity);
 
-  public async vehicleGetIn(requestBody: VehicleDto) {
-    const { id, type, username } = requestBody;
-    if (type === 'OUT') throw new HttpException(httpStatus.CONFLICT, 'Invalid type');
+  public async vehicleGetIn(requestBody: VehicleDto, currentUser: User) {
+    const { id, type } = requestBody;
+    const { email } = currentUser;
 
-    const findUser = await this.userRepository.findOne({ where: { email: username } });
-    if (!findUser) throw new HttpException(httpStatus.CONFLICT, `${username} not found`);
+    if (type === ParkingStatus.OUT) throw new HttpException(httpStatus.BAD_REQUEST, 'Invalid type');
 
-    const findVehicle = await this.vehicleRepository.findOne({ where: { licensePlates: id.licensePlates, isIn: 'IN' } });
+    const findVehicle = await this.vehicleRepository.findOne({ where: { licensePlates: id.licensePlates, isIn: ParkingStatus.IN } });
     if (findVehicle) throw new HttpException(httpStatus.CONFLICT, `${id.licensePlates} is available in park`);
 
-    const vehicleValue = new VehicleEntity(
-      id.twoFirstDigits,
-      id.vehicleColor,
-      id.block,
-      id.slotId,
-      id.fourLastDigits,
-      type,
-      id.licensePlates,
-      findUser.email,
-    );
+    const vehicleValue = new VehicleEntity(id.twoFirstDigits, id.vehicleColor, id.fourLastDigits, type, id.licensePlates, email);
     const saveValue = await this.vehicleRepository.save(vehicleValue);
     return saveValue;
   }
 
   public async updateVehicleLocation(requestBody: ParkingVehicleDto) {
     const { licensePlates, blockId, slotId, type } = requestBody;
-    if (type !== 'PARKING') throw new HttpException(httpStatus.CONFLICT, 'Vehicle is out of the parking lot');
+    if (type !== ParkingStatus.PARKING) throw new HttpException(httpStatus.BAD_REQUEST, 'Invalid type');
 
-    const findLocation = await this.vehicleRepository.findOne({ where: { block: blockId, slotId: slotId, isIn: 'IN' } });
+    const findLocation = await this.vehicleRepository.findOne({ where: { block: blockId, slotId: slotId, isIn: ParkingStatus.PARKING } });
     if (findLocation) throw new HttpException(httpStatus.CONFLICT, `Block: ${findLocation.block} and SlotId: ${findLocation.slotId} has occupied`);
 
-    const findVehicle = await this.vehicleRepository.findOne({ where: { licensePlates, isIn: 'IN' } });
+    const findVehicle = await this.vehicleRepository.findOne({ where: { licensePlates, isIn: ParkingStatus.IN } });
     if (!findVehicle) throw new HttpException(httpStatus.CONFLICT, `Vehicle has license ${findVehicle.licensePlates} doesn't exist in parking lot`);
 
     await this.vehicleRepository.update({ licensePlates: findVehicle.licensePlates }, { block: blockId, slotId, isIn: type });
@@ -50,5 +41,23 @@ export class VehicleService {
     return findNewSlot;
   }
 
+  public async vehicleGetOut(requestBody: ParkingVehicleDto) {
+    const { licensePlates, blockId, slotId, type } = requestBody;
+    if (type !== ParkingStatus.OUT) throw new HttpException(httpStatus.BAD_REQUEST, 'Invalid type');
+
+    const findLocation = await this.vehicleRepository.findOne({
+      where: { licensePlates, block: blockId, slotId, isIn: ParkingStatus.PARKING || ParkingStatus.IN },
+    });
+    if (!findLocation)
+      throw new HttpException(httpStatus.CONFLICT, `${licensePlates}, ${blockId} or ${slotId} doesn't exist in parking lot, please check again`);
+
+    await this.vehicleRepository.update(
+      { licensePlates: findLocation.licensePlates },
+      { block: null, slotId: null, cameraId: null, isIn: ParkingStatus.OUT },
+    );
+
+    const findVehicleStatus = await this.vehicleRepository.findOne({ where: { licensePlates: findLocation.licensePlates } });
+    return findVehicleStatus;
+  }
   // public async vehicleGetOut(requestBody: VehicleDto) {}
 }

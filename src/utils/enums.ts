@@ -80,3 +80,9 @@ export enum TypeAlert {
   RAM = 'RAM',
   STORAGE = 'STORAGE',
 }
+
+export enum ParkingStatus {
+  IN = 'IN',
+  PARKING = 'PARKING',
+  OUT = 'OUT',
+}
