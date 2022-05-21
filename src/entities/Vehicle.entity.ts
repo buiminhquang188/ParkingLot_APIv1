@@ -20,6 +20,9 @@ export class VehicleEntity {
   @Column()
   otherDigits: string;
 
+  @Column({ nullable: true })
+  cameraId: string;
+
   @Column()
   block: string;
 

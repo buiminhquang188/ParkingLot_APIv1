@@ -8,7 +8,7 @@ export class UserEntity implements User {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
-  @Column({ unique: true, length: 30 })
+  @Column({ length: 30 })
   @IsNotEmpty()
   username: string;
 
