@@ -14,7 +14,7 @@ export class VehicleEntity {
   @Column()
   otherDigits: string;
 
-  @Column()
+  @Column({ nullable: true })
   cameraId: string;
 
   @UpdateDateColumn()

@@ -1,8 +1,7 @@
-import { isCamelCase } from './../utils/util';
-import { dbConnection } from '@databases';
 import { UserEntity } from '@/entities/Users.entity';
+import { dbConnection } from '@databases';
 // import * as pagination from '@/utils/pagination/helper/pagination';
-import { CreateUserDto, SearchUserDto, UpdateUserDto } from '@dtos/users.dto';
+import { CreateUserDto, SearchUserDto, UpdateUserDto, UpdateUserProfileDto } from '@dtos/users.dto';
 import { HttpException } from '@exceptions/HttpException';
 import { User } from '@interfaces/users.interface';
 import { isEmpty } from '@utils/util';
@@ -15,7 +14,7 @@ class UserService {
 
   public async findAllUser(searchParam: SearchUserDto): Promise<any> {
     const { username, email, status, tel } = searchParam;
-    
+
     const users = await this.userRepository
       .createQueryBuilder()
       .withDeleted()
@@ -128,6 +127,16 @@ class UserService {
   //   const rolesData: Roles[] = await roleRepository.find({ select: ['role', 'nameRole'] });
   //   return rolesData;
   // }
+
+  public async updateProfileUser(currentUser: User, requestBody: UpdateUserProfileDto) {
+    const { id } = currentUser;
+    const { username, address, tel } = requestBody;
+
+    await this.userRepository.update(id, { username, address, tel });
+    const findUser = await this.userRepository.findOne({ where: { id } });
+
+    return findUser;
+  }
 }
 
 export default UserService;
