@@ -38,12 +38,12 @@ export class VehicleController {
           schema: {
             $ref: '#/components/schemas/ParkingVehicleDto',
           },
-          example: {
-            type: ParkingStatus.IN,
-            licensePlates: 'string',
-            blockId: 'string',
-            slotId: 'string',
-          },
+          // example: {
+          //   type: ParkingStatus.IN,
+          //   licensePlates: 'string',
+          //   blockId: 'string',
+          //   slotId: 'string',
+          // },
         },
       },
     },

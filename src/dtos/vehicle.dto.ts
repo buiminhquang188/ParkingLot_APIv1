@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsDefined, IsIn, IsNotEmpty, IsNotEmptyObject, IsString, ValidateNested } from 'class-validator';
+import { IsDefined, IsIn, IsMACAddress, IsNotEmpty, IsNotEmptyObject, IsString, ValidateNested } from 'class-validator';
 import 'reflect-metadata';
 const type = ['IN', 'PARKING', 'OUT'] as const;
 
@@ -44,9 +44,6 @@ export class ParkingVehicleDto {
 
   @IsString()
   @IsNotEmpty()
-  blockId: string;
-
-  @IsString()
-  @IsNotEmpty()
-  slotId: string;
+  @IsMACAddress()
+  macAddress: string;
 }
