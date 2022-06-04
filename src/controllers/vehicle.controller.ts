@@ -48,7 +48,7 @@ export class VehicleController {
             $ref: '#/components/schemas/ParkingVehicleDto',
           },
           example: {
-            type: ParkingStatus.IN,
+            type: ParkingStatus.PARKING,
             licensePlates: 'FT-1234567',
             macAddress: 'DF:1E:7E:E8:C1:CE',
           },
@@ -71,7 +71,7 @@ export class VehicleController {
             $ref: '#/components/schemas/ParkingVehicleDto',
           },
           example: {
-            type: ParkingStatus.IN,
+            type: ParkingStatus.OUT,
             licensePlates: 'FT-1234567',
             macAddress: 'DF:1E:7E:E8:C1:CE',
           },
