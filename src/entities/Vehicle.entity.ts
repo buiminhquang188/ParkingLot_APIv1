@@ -23,11 +23,11 @@ export class VehicleEntity {
   @Column({ nullable: true })
   cameraId: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, length: 1, type: 'char' })
   block: string;
 
   @Column({ nullable: true })
-  slotId: string;
+  slotId: number;
 
   @Column()
   isIn: string;
