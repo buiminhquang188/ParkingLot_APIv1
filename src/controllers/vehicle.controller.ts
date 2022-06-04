@@ -20,6 +20,15 @@ export class VehicleController {
           schema: {
             $ref: '#/components/schemas/VehicleDto',
           },
+          example: {
+            type: ParkingStatus.IN,
+            id: {
+              vehicleColor: 'white',
+              twoFirstDigits: 'FT',
+              fourLastDigits: '1234567',
+              licensePlates: 'FT-1234567',
+            },
+          },
         },
       },
     },
@@ -38,12 +47,11 @@ export class VehicleController {
           schema: {
             $ref: '#/components/schemas/ParkingVehicleDto',
           },
-          // example: {
-          //   type: ParkingStatus.IN,
-          //   licensePlates: 'string',
-          //   blockId: 'string',
-          //   slotId: 'string',
-          // },
+          example: {
+            type: ParkingStatus.IN,
+            licensePlates: 'FT-1234567',
+            macAddress: 'DF:1E:7E:E8:C1:CE',
+          },
         },
       },
     },
@@ -63,10 +71,9 @@ export class VehicleController {
             $ref: '#/components/schemas/ParkingVehicleDto',
           },
           example: {
-            type: ParkingStatus.PARKING,
-            licensePlates: 'string',
-            blockId: 'string',
-            slotId: 'string',
+            type: ParkingStatus.IN,
+            licensePlates: 'FT-1234567',
+            macAddress: 'DF:1E:7E:E8:C1:CE',
           },
         },
       },

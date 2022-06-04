@@ -39,7 +39,6 @@ export class VehicleService {
     if (findLocation) throw new HttpException(httpStatus.CONFLICT, `Block: ${findLocation.block} and SlotId: ${findLocation.slotId} has occupied`);
 
     const findVehicle = await this.vehicleRepository.findOne({ where: { licensePlates, isIn: ParkingStatus.IN } });
-
     if (!findVehicle) throw new HttpException(httpStatus.CONFLICT, `Vehicle has license ${licensePlates} doesn't exist in parking lot`);
 
     await this.vehicleRepository.update(
