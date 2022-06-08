@@ -7,6 +7,7 @@ import { VehicleEntity } from './../entities/Vehicle.entity';
 import { dbConnection } from '@/databases';
 import { ParkingStatus } from '@/utils/enums';
 import { LocationEntity } from '@/entities/Location.entity';
+import { In, IsNull, Not } from 'typeorm';
 export class VehicleService {
   private vehicleRepository = dbConnection.getRepository(VehicleEntity);
   private userRepository = dbConnection.getRepository(UserEntity);
@@ -18,12 +19,23 @@ export class VehicleService {
 
     if (type === ParkingStatus.OUT) throw new HttpException(httpStatus.BAD_REQUEST, 'Invalid type');
 
-    const findVehicle = await this.vehicleRepository.findOne({ where: { licensePlates: id.licensePlates, isIn: ParkingStatus.IN } });
+    const findVehicle = await this.vehicleRepository.findOne({
+      where: { licensePlates: id.licensePlates, isIn: In([ParkingStatus.IN, ParkingStatus.PARKING]) },
+    });
     if (findVehicle) throw new HttpException(httpStatus.CONFLICT, `${id.licensePlates} is available in park`);
+
+    const findSlotOccupie = await this.vehicleRepository
+      .find({ where: { cameraId: Not(IsNull()) } })
+      .then((data) => data.map((slot) => slot.cameraId));
+
+    const findEmptySlot = await this.locationRepository
+      .find({ where: { macAddress: Not(In(findSlotOccupie)) } })
+      .then((data) => data.map((empty) => ({ location: empty.blockId + empty.slotId })));
 
     const vehicleValue = new VehicleEntity(id.twoFirstDigits, id.vehicleColor, id.fourLastDigits, type, id.licensePlates, email);
     const saveValue = await this.vehicleRepository.save(vehicleValue);
-    return saveValue;
+
+    return { saveValue, emptySlot: findEmptySlot };
   }
 
   public async updateVehicleLocation(requestBody: ParkingVehicleDto) {
