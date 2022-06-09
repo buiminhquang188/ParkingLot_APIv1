@@ -9,6 +9,7 @@ import { isEmpty } from '@utils/util';
 import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
 import { Brackets } from 'typeorm';
+import { ParkingStatus } from '@/utils/enums';
 
 class UserService {
   private userRepository = dbConnection.getRepository(UserEntity);
@@ -142,8 +143,8 @@ class UserService {
 
   public async getUserVehicle(currentUser: User) {
     const { email } = currentUser;
-    const userVehicle = await this.vehicleRepository.findOne({ where: { username: email, isIn: 'PARKING' } });
-    if (!userVehicle) throw new HttpException(httpStatus.BAD_REQUEST, `Vehicle of user ${currentUser.email} is not in parking lot`);
+    const userVehicle = await this.vehicleRepository.findOne({ where: { username: email, isIn: ParkingStatus.PARKING } });
+    if (!userVehicle) return { data: null };
     return userVehicle;
   }
 }
