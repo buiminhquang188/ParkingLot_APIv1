@@ -144,7 +144,7 @@ class UserService {
   public async getUserVehicle(currentUser: User) {
     const { email } = currentUser;
     const userVehicle = await this.vehicleRepository.findOne({ where: { username: email, isIn: ParkingStatus.PARKING } });
-    if (!userVehicle) return { data: null };
+    if (!userVehicle) return null;
     return userVehicle;
   }
 }
