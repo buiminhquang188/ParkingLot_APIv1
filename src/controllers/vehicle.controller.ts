@@ -1,6 +1,6 @@
 import { User } from './../interfaces/users.interface';
 import { VehicleDto, ParkingVehicleDto } from './../dtos/vehicle.dto';
-import { ContentType, Controller, Post, Body, Patch, CurrentUser, Authorized } from 'routing-controllers';
+import { ContentType, Controller, Post, Body, Patch, CurrentUser, Authorized, Param } from 'routing-controllers';
 import { VehicleService } from './../services/vehicle.service';
 import { OpenAPI } from 'routing-controllers-openapi';
 import { ParkingStatus } from '@/utils/enums';
@@ -59,7 +59,7 @@ export class VehicleController {
   @Authorized()
   @ContentType('application/json')
   public async vehicleParking(@Body() requestBody: ParkingVehicleDto) {
-    return await this.vehicleService.updateVehicleLocation(requestBody);
+    return { data: await this.vehicleService.updateVehicleLocation(requestBody) };
   }
 
   @Patch('/vehicle/get-out')
@@ -82,6 +82,6 @@ export class VehicleController {
   @Authorized()
   @ContentType('application/json')
   public async vehicleGetOut(@Body() requestBody: ParkingVehicleDto) {
-    return await this.vehicleService.vehicleGetOut(requestBody);
+    return { data: await this.vehicleService.vehicleGetOut(requestBody) };
   }
 }
