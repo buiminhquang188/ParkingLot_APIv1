@@ -24,18 +24,13 @@ export class VehicleService {
     });
     if (findVehicle) throw new HttpException(httpStatus.CONFLICT, `${id.licensePlates} is available in park`);
 
-    const findSlotOccupie = await this.vehicleRepository
-      .find({ where: { cameraId: Not(IsNull()) } })
-      .then((data) => data.map((slot) => slot.cameraId));
-
-    const findEmptySlot = await this.locationRepository
-      .find({ where: { macAddress: Not(In(findSlotOccupie)) } })
-      .then((data) => data.map((empty) => ({ location: empty.blockId + empty.slotId })));
+    const findSlotEmpty = await this.locationRepository.find({ where: { isOccupied: 'N', isUse: 'Y' }, select: ['blockId', 'slotId', 'isOccupied'] });
+    if (findSlotEmpty?.length === 0) throw new HttpException(httpStatus.BAD_REQUEST, 'All slot is full');
+    const location = findSlotEmpty.map((item) => ({ slot: item.blockId + item.slotId }));
 
     const vehicleValue = new VehicleEntity(id.twoFirstDigits, id.vehicleColor, id.fourLastDigits, type, id.licensePlates, email);
     const saveValue = await this.vehicleRepository.save(vehicleValue);
-
-    return { saveValue, emptySlot: findEmptySlot };
+    return { saveValue, emptySlot: location };
   }
 
   public async updateVehicleLocation(requestBody: ParkingVehicleDto) {
@@ -71,7 +66,7 @@ export class VehicleService {
     if (!findMacAddress) throw new HttpException(httpStatus.CONFLICT, `${macAddress} is invalid`);
 
     const findLocation = await this.vehicleRepository.findOne({
-      where: { licensePlates, block: findMacAddress.blockId, slotId: findMacAddress.slotId, isIn: ParkingStatus.PARKING || ParkingStatus.IN },
+      where: { licensePlates, block: findMacAddress.blockId, slotId: findMacAddress.slotId, isIn: In([ParkingStatus.PARKING, ParkingStatus.IN]) },
     });
     if (!findLocation) throw new HttpException(httpStatus.CONFLICT, `${licensePlates} doesn't exist in parking lot, please check again`);
 
