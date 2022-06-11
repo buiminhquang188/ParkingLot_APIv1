@@ -1,3 +1,4 @@
+import { VerifyTokenDto } from './../dtos/users.dto';
 import { dbConnection } from '@databases';
 import { SECRET_KEY } from '@config';
 import bcrypt from 'bcrypt';
@@ -56,6 +57,11 @@ class AuthService {
 
   public createCookie(tokenData: TokenData): string {
     return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn};`;
+  }
+
+  public async verifyToken(requestBody: VerifyTokenDto, currrentUser: User) {
+    const { token } = requestBody;
+    return currrentUser;
   }
 }
 
