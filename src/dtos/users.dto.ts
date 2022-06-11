@@ -1,7 +1,7 @@
 // import { Pagination } from '@/utils/pagination/pagination.dto';
 import { Role } from '@/utils/enums';
 import { Pagination } from '@/utils/pagination/pagination.dto';
-import { IsAlpha, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
+import { IsAlpha, IsEmail, IsEnum, IsJWT, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
 
 export class UserCreateDto {
   @IsString()
@@ -105,4 +105,10 @@ export class UpdateUserProfileDto {
   @IsString()
   @IsOptional()
   address: string;
+}
+
+export class VerifyTokenDto {
+  @IsJWT()
+  @IsNotEmpty()
+  token: string;
 }
