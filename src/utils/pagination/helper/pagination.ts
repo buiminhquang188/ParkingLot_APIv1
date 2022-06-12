@@ -5,13 +5,15 @@ export const paginate = async function (
   page: number,
   pageSize: number,
   sortBy: string,
-  sortOrder,
+  sortOrder: any,
 ): Promise<PaginationAwareObject> {
   const skip = (page - 1) * pageSize;
   const count = await builder.getCount();
   const calcule_last_page = count % pageSize;
   const last_page = calcule_last_page === 0 ? count / pageSize : Math.trunc(count / pageSize) + 1;
   let res = null;
+
+  if(!sortBy) sortBy = 'createdAt';
   if (isCamelCase(sortBy)) sortBy = JSON.stringify(sortBy);
 
   if (sortBy) {
