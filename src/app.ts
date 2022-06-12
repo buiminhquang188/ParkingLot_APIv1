@@ -102,11 +102,9 @@ class App {
       },
       controllers: controllers,
       defaultErrorHandler: false,
-      authorizationChecker: async (action: Action) => {        
+      authorizationChecker: async (action: Action) => {
         try {
           const token = action.request.header('Authorization')?.split('Bearer ')[1] || null;
-          console.log(token);
-          
           const secretKey: string = SECRET_KEY;
           const verificationResponse = jwt.verify(token, secretKey) as DataStoredInToken;
           const userId = verificationResponse.id;
