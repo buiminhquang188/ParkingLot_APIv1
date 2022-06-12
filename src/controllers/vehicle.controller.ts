@@ -1,5 +1,5 @@
 import { User } from './../interfaces/users.interface';
-import { VehicleDto, ParkingVehicleDto } from './../dtos/vehicle.dto';
+import { VehicleDto, ParkingVehicleDto, GetOutVehicleDto } from './../dtos/vehicle.dto';
 import { ContentType, Controller, Post, Body, Patch, CurrentUser, Authorized, Param } from 'routing-controllers';
 import { VehicleService } from './../services/vehicle.service';
 import { OpenAPI } from 'routing-controllers-openapi';
@@ -68,12 +68,12 @@ export class VehicleController {
       content: {
         'application/json': {
           schema: {
-            $ref: '#/components/schemas/ParkingVehicleDto',
+            $ref: '#/components/schemas/VehicleDto',
           },
           example: {
             type: ParkingStatus.OUT,
+            location: 'A1',
             licensePlates: 'FT-1234567',
-            macAddress: 'DF:1E:7E:E8:C1:CE',
           },
         },
       },
@@ -81,7 +81,7 @@ export class VehicleController {
   })
   @Authorized()
   @ContentType('application/json')
-  public async vehicleGetOut(@Body() requestBody: ParkingVehicleDto) {
+  public async vehicleGetOut(@Body() requestBody: GetOutVehicleDto) {
     return { data: await this.vehicleService.vehicleGetOut(requestBody) };
   }
 }

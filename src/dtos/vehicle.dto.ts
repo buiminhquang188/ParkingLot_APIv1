@@ -47,3 +47,17 @@ export class ParkingVehicleDto {
   @IsMACAddress()
   macAddress: string;
 }
+
+export class GetOutVehicleDto {
+  @IsIn(type)
+  @IsNotEmpty()
+  type: string;
+
+  @IsString()
+  @IsNotEmpty()
+  licensePlates: string;
+
+  @IsString()
+  @IsNotEmpty()
+  location: string;
+}
