@@ -2,7 +2,7 @@ import { User } from './../interfaces/users.interface';
 import httpStatus from 'http-status';
 import { HttpException } from '@exceptions/HttpException';
 import { UserEntity } from '@/entities/Users.entity';
-import { VehicleDto, ParkingVehicleDto } from './../dtos/vehicle.dto';
+import { VehicleDto, ParkingVehicleDto, GetOutVehicleDto } from './../dtos/vehicle.dto';
 import { VehicleEntity } from './../entities/Vehicle.entity';
 import { dbConnection } from '@/databases';
 import { ParkingStatus } from '@/utils/enums';
@@ -58,16 +58,15 @@ export class VehicleService {
     return findNewSlot;
   }
 
-  public async vehicleGetOut(requestBody: ParkingVehicleDto) {
-    const { licensePlates, macAddress, type } = requestBody;
+  public async vehicleGetOut(requestBody: GetOutVehicleDto) {
+    const { licensePlates, location, type } = requestBody;
     if (type !== ParkingStatus.OUT) throw new HttpException(httpStatus.BAD_REQUEST, 'Invalid type');
-
-    const findMacAddress = await this.locationRepository.findOne({ where: { macAddress } });
-    if (!findMacAddress) throw new HttpException(httpStatus.CONFLICT, `${macAddress} is invalid`);
+    const splitLocation = location.split(/([0-9]+)/).filter(Boolean);
 
     const findLocation = await this.vehicleRepository.findOne({
-      where: { licensePlates, block: findMacAddress.blockId, slotId: findMacAddress.slotId, isIn: In([ParkingStatus.PARKING, ParkingStatus.IN]) },
+      where: { licensePlates, block: splitLocation[0], slotId: +splitLocation[1], isIn: In([ParkingStatus.PARKING, ParkingStatus.IN]) },
     });
+
     if (!findLocation) throw new HttpException(httpStatus.CONFLICT, `${licensePlates} doesn't exist in parking lot, please check again`);
 
     await this.vehicleRepository.update(
