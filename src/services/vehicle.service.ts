@@ -17,7 +17,12 @@ export class VehicleService {
     const { id, type } = requestBody;
     const { email } = currentUser;
 
-    if (type === ParkingStatus.OUT) throw new HttpException(httpStatus.BAD_REQUEST, 'Invalid type');
+    if (type !== ParkingStatus.IN) throw new HttpException(httpStatus.BAD_REQUEST, 'Invalid type');
+
+    const findUserInParkingLot = await this.vehicleRepository.findOne({
+      where: { username: email, isIn: In([ParkingStatus.IN, ParkingStatus.PARKING]) },
+    });
+    if (findUserInParkingLot) throw new HttpException(httpStatus.CONFLICT, `${email} already in parking lot`);
 
     const findVehicle = await this.vehicleRepository.findOne({
       where: { licensePlates: id.licensePlates, isIn: In([ParkingStatus.IN, ParkingStatus.PARKING]) },
@@ -29,8 +34,19 @@ export class VehicleService {
     const location = findSlotEmpty.map((item) => ({ slot: item.blockId + item.slotId }));
 
     const vehicleValue = new VehicleEntity(id.twoFirstDigits, id.vehicleColor, id.fourLastDigits, type, id.licensePlates, email);
-    const saveValue = await this.vehicleRepository.save(vehicleValue);
-    return { saveValue, emptySlot: location };
+    await this.vehicleRepository.insert(vehicleValue);
+
+    const insertValue = await this.vehicleRepository.findOne({
+      where: {
+        username: vehicleValue.username,
+        twoDigits: vehicleValue.twoDigits,
+        otherDigits: vehicleValue.otherDigits,
+        isIn: vehicleValue.isIn,
+        licensePlates: vehicleValue.licensePlates,
+      },
+    });
+
+    return { insertValue, emptySlot: location };
   }
 
   public async updateVehicleLocation(requestBody: ParkingVehicleDto) {
